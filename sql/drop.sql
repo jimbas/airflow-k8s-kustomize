@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS airflow;
+DROP USER IF EXISTS airflow;

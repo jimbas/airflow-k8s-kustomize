@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+spec:
+  selector:
+    matchLabels:
+      app: airflow-scheduler
+  template:
+    metadata:
+      labels:
+        app: airflow-scheduler
+    spec:
+      initContainers:
+        - name: db-init
+          image: _GCP_K8S_REGION_-docker.pkg.dev/_GCP_PROJECT_ID_/_DOCKER_REPO_NAME_/_DOCKER_REPO_TAG_
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+            - "-c"
+          args:
+            - "airflow db init && airflow db upgrade && airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      containers:
+        - name: scheduler
+          image: _GCP_K8S_REGION_-docker.pkg.dev/_GCP_PROJECT_ID_/_DOCKER_REPO_NAME_/_DOCKER_REPO_TAG_
+          imagePullPolicy: Always
+          command:
+            - "airflow"
+            - "scheduler"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      serviceAccountName: airflow-scheduler

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+spec:
+  selector:
+    matchLabels:
+      app: airflow-webserver
+  template:
+    metadata:
+      labels:
+        app: airflow-webserver
+    spec:
+      initContainers:
+        - name: db-init
+          image: _GCP_K8S_REGION_-docker.pkg.dev/_GCP_PROJECT_ID_/_DOCKER_REPO_NAME_/_DOCKER_REPO_TAG_
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+            - "-c"
+          args:
+            - "airflow db init && airflow db upgrade && airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+      containers:
+        - name: webserver
+          image: _GCP_K8S_REGION_-docker.pkg.dev/_GCP_PROJECT_ID_/_DOCKER_REPO_NAME_/_DOCKER_REPO_TAG_
+          imagePullPolicy: Always
+          command:
+            - "airflow"
+            - "webserver"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+      serviceAccountName: airflow-webserver

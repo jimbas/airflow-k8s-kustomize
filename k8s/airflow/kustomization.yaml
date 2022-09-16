@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonLabels:
+  app: airflow
+resources:
+  - webserver
+  - scheduler
+  - airflow-worker-configmap.yaml
+configMapGenerator:
+  - name: airflow-config
+    literals:
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN="postgresql://airflow:airflow@postgres-postgresql.default.svc.cluster.local/airflow"
+      - AIRFLOW__CORE__LOAD_EXAMPLES="false"
+      - AIRFLOW__CORE__EXECUTOR="KubernetesExecutor"
+      - AIRFLOW__CORE__UNIT_TEST_MODE="false"
+      - AIRFLOW__KUBERNETES__DAGS_IN_IMAGE="true"
+      - AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY="asia-southeast1-docker.pkg.dev/dataengineering-351211/airflow-repo/airflow"
+      - AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG="latest"
+      - AIRFLOW__KUBERENTES__WORKER_CONTAINER_IMAGE_PULL_POLICY="Always"
+      - AIRFLOW__KUBERNETES__ENV_FROM_CONFIGMAP_REF="airflow-worker-config"
+      - AIRFLOW__KUBERNETES__DELETE_WORKER_PODS="false"
+      - AIRFLOW__KUBERNETES__RUN_AS_USER="1000"
+      - AIRFLOW__KUBERNETES__WORKER_SERVICE_ACCOUNT_NAME="airflow-scheduler"

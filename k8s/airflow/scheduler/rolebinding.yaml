@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow-scheduler
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: airflow-scheduler
+roleRef:
+  kind: Role
+  name: airflow-scheduler
+  apiGroup: rbac.authorization.k8s.io

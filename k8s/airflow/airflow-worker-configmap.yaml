@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-worker-config
+  labels:
+    tier: worker
+data:
+  AIRFLOW_HOME: /opt/airflow
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql://airflow:airflow@postgres-postgresql.default.svc.cluster.local/airflow"
