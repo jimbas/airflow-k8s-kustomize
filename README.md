@@ -4,10 +4,6 @@
 
 [Airflow Kube](https://github.com/houstonj1/airflow-kube)
 
-## Requirements
-1. Active GCP console
-2. ...
-
 ## Initialize Environment Variables
   ```
   export GCP_PROJECT_ID='your-google-cloud-project-id'
